@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Facebook Mass Unfriend</title>
+  <style>
+    body {
+      width: 350px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .info-text {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+      text-align: center;
+      font-style: italic;
+    }
+    .search-container {
+      margin-bottom: 10px;
+      display: flex;
+      gap: 5px;
+    }
+    #search {
+      flex-grow: 1;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #refresh {
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 0 10px;
+    }
+    .friend-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      padding: 5px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+    }
+    .friend-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #eee;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    .friend-item {
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .friend-item:last-child {
+      border-bottom: none;
+    }
+    .friend-item label {
+      margin-left: 5px;
+      flex-grow: 1;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      margin-left: 5px;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      line-height: 16px;
+      font-size: 12px;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      top: -5px;
+      right: 125%;
+      margin-right: 10px;
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+      font-size: 12px;
+      font-weight: normal;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      margin-top: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent transparent transparent #555;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    .controls {
+      background-color: #f9f9f9;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .control-row {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+    .control-row label {
+      flex-grow: 1;
+    }
+    .control-row input {
+      width: 70px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #start {
+      background-color: #4267B2;
+      color: white;
+    }
+    #startUnfollow {
+      background-color: #5cb85c;
+      color: white;
+    }
+    #stop {
+      background-color: #e74c3c;
+      color: white;
+    }
+    #loadAll {
+      background-color: #f0ad4e;
+      color: white;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .status {
+      margin-top: 10px;
+      text-align: center;
+      font-style: italic;
+      color: #666;
+    }
+    .error {
+      color: #e74c3c;
+    }
+    .success {
+      color: #5cb85c;
+    }
+    .progress-container {
+      margin-top: 10px;
+      display: none;
+    }
+    .progress-bar {
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: #4267B2;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .progress-text {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 5px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Facebook Mass Unfriend</h2>
+  </div>
+  
+  <div class="info-text">
+    Check the boxes next to friends you want to <strong>keep</strong> (whitelist).
+  </div>
+  
+  <div class="search-container">
+    <input type="text" id="search" placeholder="Search friends...">
+    <button id="refresh" title="Refresh friends list">Refresh</button>
+  </div>
+  
+  <div id="friendList" class="friend-list">
+    <div class="status">Loading friends...</div>
+  </div>
+  
+  <button id="loadAll">Load All Friends (Auto-scroll)</button>
+  
+  <div id="progressContainer" class="progress-container">
+    <div class="progress-bar">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+    <div id="progressText" class="progress-text">Loading friends...</div>
+  </div>
+  
+  <div class="controls">
+    <div class="control-row">
+      <label>Delay between actions (seconds):</label>
+      <input type="number" id="delay" min="1" value="2">
+    </div>
+    <div class="control-row">
+      <label>Daily limit:</label>
+      <input type="number" id="limit" min="1" value="500">
+    </div>
+    <div class="control-row">
+      <button id="resetSettings" style="background-color: #f0f0f0; color: #333; font-size: 12px; padding: 5px 10px; margin-left: auto;">Reset Settings</button>
+    </div>
+    <div class="button-row">
+      <div class="action-buttons">
+        <button id="start">Unfriend</button>
+        <button id="startUnfollow">Unfollow</button>
+      </div>
+      <button id="stop">Stop</button>
+    </div>
+  </div>
+  
+  <div id="status" class="status"></div>
+  
+  <script src="popup.js"></script>
+</body>
+</html> 

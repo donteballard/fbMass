@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Facebook Mass Unfriend",
+  "version": "1.0",
+  "description": "Mass unfriend/unfollow tool for Facebook",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.facebook.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+} 
